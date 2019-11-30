@@ -1,4 +1,4 @@
-{ stdenv, fetchzip, libGLU_combined, unzip, libXrandr, libX11, libXxf86vm }:
+{ stdenv, fetchzip, libGLU_combined, unzip, libXrandr, libX11, libXxf86vm, mesa }:
 
 
 stdenv.mkDerivation rec {
