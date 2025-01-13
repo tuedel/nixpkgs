@@ -1,28 +1,50 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  buildNpmPackage,
+  fetchFromGitHub,
   nixosTests,
-  olm,
 }:
 
-stdenv.mkDerivation rec {
+buildNpmPackage rec {
   pname = "jitsi-meet";
-  version = "1.0.8043";
+  version = "2.0.9955";
 
-  src = fetchurl {
-    url = "https://download.jitsi.org/jitsi-meet/src/jitsi-meet-${version}.tar.bz2";
-    sha256 = "XJlfCMQXnHjfHQhK916RXsdPzrU2U2IaOMiXIHL1sCI=";
+  src = fetchFromGitHub {
+    owner = "jitsi";
+    repo = "jitsi-meet";
+    tag = "stable/jitsi-meet_${builtins.substring 4 (-1) version}";
+    hash = "sha256-WvLzq2qzRPCDCpR8BQpTCaPubCBKBcV9LBcjmkEZPdc=";
   };
 
-  dontBuild = true;
+  npmDepsHash = "sha256-OIZV56mvH81RpYs7Fw8HwltH9l4Hz2NtLWAYbOaklOM=";
+  makeCacheWritable = true;
+
+  postPatch = ''
+    substituteInPlace package.json \
+      --replace-fail '"scripts": {' '"scripts": {"build": "make",'
+  '';
 
   installPhase = ''
     runHook preInstall
-    mkdir $out
-    mv * $out/
+    mkdir -p $out/css
+    cp --no-preserve=mode -prt $out/ \
+      libs \
+      static \
+      sounds \
+      fonts \
+      images \
+      lang \
+      *.html \
+      config.js \
+      interface_config.js \
+      pwa-worker.js \
+      manifest.json \
+      resources/robots.txt
+    cp --no-preserve=mode css/all.css $out/css/
     runHook postInstall
   '';
+
 
   # Test requires running Jitsi Videobridge and Jicofo which are Linux-only
   passthru.tests = lib.optionalAttrs stdenv.hostPlatform.isLinux {
@@ -41,6 +63,5 @@ stdenv.mkDerivation rec {
     license = licenses.asl20;
     maintainers = teams.jitsi.members;
     platforms = platforms.all;
-    inherit (olm.meta) knownVulnerabilities;
   };
 }
