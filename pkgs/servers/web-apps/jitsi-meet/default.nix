@@ -51,8 +51,6 @@ buildNpmPackage rec {
     single-host-smoke-test = nixosTests.jitsi-meet;
   };
 
-  passthru.updateScript = ./update.sh;
-
   meta = with lib; {
     description = "Secure, Simple and Scalable Video Conferences";
     longDescription = ''
