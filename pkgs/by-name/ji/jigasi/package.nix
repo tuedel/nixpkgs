@@ -9,10 +9,10 @@
 
 let
   pname = "jigasi";
-  version = "1.1-311-g3de47d0";
+  version = "1.1-369-gb80d3df";
   src = fetchurl {
     url = "https://download.jitsi.org/stable/${pname}_${version}-1_all.deb";
-    hash = "sha256-pwUgkId7AHFjbqYo02fBgm0gsiMqEz+wvwkdy6sgTD0=";
+    hash = "sha256-VzY5HLch0edrFnNWOS8JXCI5/CzHxmBIE+KHJKo+Jgs=";
   };
 in
 stdenv.mkDerivation {
