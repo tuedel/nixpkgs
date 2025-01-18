@@ -38,6 +38,8 @@ stdenv.mkDerivation {
     single-node-smoke-test = nixosTests.jitsi-meet;
   };
 
+  passthru.updateScript = ./update.sh;
+
   meta = with lib; {
     description = "Server-side application that allows regular SIP clients to join Jitsi Meet conferences";
     mainProgram = "jigasi";
