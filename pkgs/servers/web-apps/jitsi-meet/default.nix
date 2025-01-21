@@ -2,25 +2,35 @@
   lib,
   stdenv,
   fetchurl,
+  dpkg,
   nixosTests,
   olm,
 }:
-
 stdenv.mkDerivation rec {
   pname = "jitsi-meet";
-  version = "1.0.8043";
+  version = "1.0.8339";
 
-  src = fetchurl {
-    url = "https://download.jitsi.org/jitsi-meet/src/jitsi-meet-${version}.tar.bz2";
-    sha256 = "XJlfCMQXnHjfHQhK916RXsdPzrU2U2IaOMiXIHL1sCI=";
-  };
+  srcs = [
+    (fetchurl {
+      name = "jitsi-meet-web.deb";
+      url = "https://download.jitsi.org/stable/${pname}-web_${version}-1_all.deb";
+      hash = "sha256-eqHIW88pEZkU/dwNhxEF8VJ7iMLErWdAGHJYoCR/ZNE=";
+    })
+    (fetchurl {
+      name = "jitsi-meet-web-config.deb";
+      url = "https://download.jitsi.org/stable/${pname}-web-config_${version}-1_all.deb";
+      hash = "sha256-HrSGYNU97Fr9+xPsEmAwcT/pEdfooYA6u8D+2nEVuIY=";
+    })
+  ];
+
+  nativeBuildInputs = [ dpkg ];
 
   dontBuild = true;
 
   installPhase = ''
     runHook preInstall
-    mkdir $out
-    mv * $out/
+    mv usr/share/${pname} $out
+    mv usr/share/${pname}-web-config/config.js $out/
     runHook postInstall
   '';
 
@@ -28,8 +38,6 @@ stdenv.mkDerivation rec {
   passthru.tests = lib.optionalAttrs stdenv.hostPlatform.isLinux {
     single-host-smoke-test = nixosTests.jitsi-meet;
   };
-
-  passthru.updateScript = ./update.sh;
 
   meta = with lib; {
     description = "Secure, Simple and Scalable Video Conferences";
